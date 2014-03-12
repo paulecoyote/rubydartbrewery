@@ -16,6 +16,7 @@ then
 fi
 
 cd "$DIR"
+git pull origin master
 pub update
 dart bin/rubydartbrewery.dart --output-path "$outputPath/"
 
