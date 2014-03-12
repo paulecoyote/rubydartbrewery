@@ -97,38 +97,70 @@ void main(List<String> arguments) {
 # conflicts_with 'dart-editor-edge-cs', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor-stable', :because => 'installation of dart-dsk tools in path'
 ''' + dart_install_section)
+    .catchError((e) {
+        print("DartEditorDev: ${e}");     // Finally, callback fires.
+        return -1;
+      })
     .then((_) => writeCask(outputDirectory, "DartEditorEdge", "dart-editor-edge.rb", client, raw_root_url, "editor/darteditor-macos-x64.zip",  '''
 # conflicts_with 'dart-editor-dev', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor-edge-cs', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor-stable', :because => 'installation of dart-dsk tools in path'
         ''' + dart_install_section))
+    .catchError((e) {
+        print("DartEditorEdge: ${e}");     // Finally, callback fires.
+        return -1;
+      })
     .then((_) => writeCaskWithCs(outputDirectory, "DartEditorEdgeCs", "dart-editor-edge-cs.rb", client, raw_root_url, "editor/darteditor-macos-x64.zip",  '''
 # conflicts_with 'dart-editor-dev', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor-edge', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor-stable', :because => 'installation of dart-dsk tools in path'
         ''' + dart_install_section))
+    .catchError((e) {
+        print("DartEditorEdgeCs: ${e}");     // Finally, callback fires.
+        return -1;
+      })
     .then((_) => writeCask(outputDirectory, "DartEditorStable", "dart-editor-stable.rb", client, stable_root_url, "editor/darteditor-macos-x64.zip",  '''
 # conflicts_with 'dart-editor-dev', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor-edge', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor-edge-cs', :because => 'installation of dart-dsk tools in path'
         ''' + dart_install_section))
+    .catchError((e) {
+        print("DartEditorStable: ${e}");     // Finally, callback fires.
+        return -1;
+      })
     .then((_) => writeCask(outputDirectory, "DartContentShellDev", "dart-content-shell-dev.rb", client, dev_root_url, "dartium/content_shell-macos-ia32-release.zip",  '''
 # conflicts_with 'dart-content-shell-edge', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-content-shell-stable', :because => 'installation of dart-dsk tools in path'
         ''' + cs_install_section))
+    .catchError((e) {
+        print("DartContentShellDev: ${e}");     // Finally, callback fires.
+        return -1;
+      })
     .then((_) => writeCask(outputDirectory, "DartContentShellEdge", "dart-content-shell-edge.rb", client, raw_root_url, "dartium/content_shell-macos-ia32-release.zip",  '''
 # conflicts_with 'dart-content-shell-dev', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-content-shell-stable', :because => 'installation of dart-dsk tools in path'
         ''' + cs_install_section))
+    .catchError((e) {
+        print("DartContentShellEdge: ${e}");     // Finally, callback fires.
+        return -1;
+      })
     .then((_) => writeCask(outputDirectory, "DartContentShellStable", "dart-content-shell-stable.rb", client, stable_root_url, "dartium/content_shell-macos-ia32-release.zip",  '''
 # conflicts_with 'dart-content-shell-dev', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-content-shell-edge', :because => 'installation of dart-dsk tools in path'
         ''' + cs_install_section))
+    .catchError((e) {
+        print("DartContentShellStable: ${e}");     // Finally, callback fires.
+        return -1;
+      })
     .then((_) {
       File outputFile = new File(outputDirectory.path + "/dart_versions.txt");
       return outputFile.create(recursive: true);
     })
-    .then((file) => file.writeAsString(versions_file.toString()));
+    .then((file){
+      String verBody = versions_file.toString();
+      if (verBody != null && verBody != "")
+        file.writeAsString(verBody);
+  });
 }
 
 Future writeCask(Directory outputDirectory, String cask_class_name, String cask_file_name, HttpClient client, String rootUrl, String zipPath, String installSection)
@@ -149,11 +181,13 @@ Future writeCask(Directory outputDirectory, String cask_class_name, String cask_
         return getAsString(Uri.parse(md5_file_url), client);
       })
       .then((String body) {
+        if (body == null) return null;
         md5 = md5_regex.firstMatch(body).group(1);
 
         return getAsString(Uri.parse(cs_md5_file_url), client);
       })
       .then((String body) {
+        if (body == null) return null;
         cs_md5 = md5_regex.firstMatch(body).group(1);
 
         isRawCsAvailable = cs_md5 != "xml";
@@ -163,7 +197,10 @@ Future writeCask(Directory outputDirectory, String cask_class_name, String cask_
         String cask = createDarteditorCask(cask_class_name, url, release_revision, md5, isRawCsAvailable, installSection);
         File outputFile = new File(outputDirectory.path + '/' + cask_file_name);
         return outputFile.create(recursive: true)
-            .then((file) => outputFile.writeAsString(cask));
+            .then((file) {
+                            outputFile.writeAsString(cask);
+                            return null;
+                          });
       });
 }
 
@@ -185,11 +222,13 @@ Future writeCaskWithCs(Directory outputDirectory, String cask_class_name, String
         return getAsString(Uri.parse(md5_file_url), client);
       })
       .then((String body) {
+        if (body == null) return null;
         md5 = md5_regex.firstMatch(body).group(1);
 
         return getAsString(Uri.parse(cs_md5_file_url), client);
       })
       .then((String body) {
+        if (body == null) return null;
         cs_md5 = md5_regex.firstMatch(body).group(1);
         int revision = int.parse(release_revision);
         isRawCsAvailable = cs_md5 != "xml";
@@ -201,7 +240,10 @@ Future writeCaskWithCs(Directory outputDirectory, String cask_class_name, String
           String cask = createDarteditorCask(cask_class_name, url, release_revision, md5, isRawCsAvailable, installSection);
           File outputFile = new File(outputDirectory.path + '/' + cask_file_name);
           return outputFile.create(recursive: true)
-              .then((file) => outputFile.writeAsString(cask));
+            .then((file) {
+            outputFile.writeAsString(cask);
+            return null;
+          });
         }
         else
         {
@@ -222,6 +264,7 @@ Future writeCaskWithCsRevision(int revision, Directory outputDirectory, String c
           if (body == null || body == "" || body.startsWith("<?xml version='1.0' encoding='UTF-8'?><Error>", 0))
           {
             // No version with this revision
+            // Really gross way of doing recursion with futures.
             revision--;
             return writeCaskWithCsRevision(revision, outputDirectory, cask_class_name, cask_file_name, client, rootUrl, zipPath, installSection);
           }
@@ -236,11 +279,13 @@ Future writeCaskWithCsRevision(int revision, Directory outputDirectory, String c
           return getAsString(Uri.parse(md5_file_url), client);
         })
         .then((String body) {
+          if (body == null) return null;
           md5 = md5_regex.firstMatch(body).group(1);
 
           return getAsString(Uri.parse(cs_md5_file_url), client);
         })
         .then((String body) {
+          if (body == null) return null;
           cs_md5 = md5_regex.firstMatch(body).group(1);
 
           isRawCsAvailable = cs_md5 != "xml";
@@ -252,7 +297,10 @@ Future writeCaskWithCsRevision(int revision, Directory outputDirectory, String c
             String cask = createDarteditorCask(cask_class_name, url, release_revision, md5, isRawCsAvailable, installSection);
             File outputFile = new File(outputDirectory.path + '/' + cask_file_name);
             return outputFile.create(recursive: true)
-                .then((file) => outputFile.writeAsString(cask));
+              .then((file) {
+                outputFile.writeAsString(cask);
+                return null;
+              });
           }
           else
           {
