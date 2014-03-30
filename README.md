@@ -12,6 +12,7 @@ Usage
 Use the shell scripts on Mac / Linux... or on Windows you could just use dart.
 
 pub update
+
 dart bin/rubydartbrewery.dart --output-path "../somewhere_else"
 
 Notes
