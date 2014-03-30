@@ -34,6 +34,7 @@ dart bin/rubydartbrewery.dart --output-path "$outputPath/"
 
 # Commit any changes made to the generated ruby files
 cd "$outputPath"
+cat README-template.md dart_versions.txt > README.md
 git commit -a -F "dart_versions.txt"
 git push origin master
 
