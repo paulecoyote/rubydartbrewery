@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:args/args.dart';
 
-const String root_url = "http://gsdview.appspot.com/dart-archive/channels";
+const String root_url = "http://storage.googleapis.com/dart-archive/channels";
 const String homepage_url = "http://www.dartlang.org/tools/editor/";
 
 const String dart_install_section = '''
