@@ -163,7 +163,7 @@ void main(List<String> arguments) {
     .then((file){
       String verBody = versions_file.toString();
       if (verBody != null && verBody != "")
-        file.writeAsString(verBody);
+        file.writeAsString(verBody, mode: FileMode.APPEND);
   });
 }
 
