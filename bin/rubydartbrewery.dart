@@ -98,6 +98,7 @@ void main(List<String> arguments) {
 ''' + dart_install_section, "[Changes](http://storage.googleapis.com/dart-archive/channels/dev/release/latest/changelog.html)")
     .catchError((e) {
         print("DartEditorDev: ${e} ${e.stackTrace}");     // Finally, callback fires.
+        exitCode = 2;
         return -1;
       })
     .then((_) => writeCask(outputDirectory, "DartEditorEdge", "dart-editor-edge.rb", client, raw_root_url, "editor/darteditor-macos-x64.zip",  '''
@@ -107,6 +108,7 @@ void main(List<String> arguments) {
         ''' + dart_install_section, "-"))
     .catchError((e) {
         print("DartEditorEdge: ${e} ${e.stackTrace}");     // Finally, callback fires.
+        exitCode = 2;
         return -1;
       })
     .then((_) => writeCaskWithCs(outputDirectory, "DartEditorEdgeCs", "dart-editor-edge-cs.rb", client, raw_root_url, "editor/darteditor-macos-x64.zip",  '''
@@ -116,6 +118,7 @@ void main(List<String> arguments) {
         ''' + dart_install_section, "-"))
     .catchError((e) {
         print("DartEditorEdgeCs: ${e} ${e.stackTrace}");     // Finally, callback fires.
+        exitCode = 2;
         return -1;
       })
     .then((_) => writeCask(outputDirectory, "DartEditorStable", "dart-editor-stable.rb", client, stable_root_url, "editor/darteditor-macos-x64.zip",  '''
@@ -125,6 +128,7 @@ void main(List<String> arguments) {
         ''' + dart_install_section, "[Changes](http://storage.googleapis.com/dart-archive/channels/stable/release/latest/changelog.html)"))
     .catchError((e) {
         print("DartEditorStable: ${e} ${e.stackTrace}");     // Finally, callback fires.
+        exitCode = 2;
         return -1;
       })
     .then((_) => writeCask(outputDirectory, "DartContentShellDev", "dart-content-shell-dev.rb", client, dev_root_url, "dartium/content_shell-macos-ia32-release.zip",  '''
@@ -133,6 +137,7 @@ void main(List<String> arguments) {
         ''' + cs_install_section, "-"))
     .catchError((e) {
         print("DartContentShellDev: ${e} ${e.stackTrace}");     // Finally, callback fires.
+        exitCode = 2;
         return -1;
       })
     .then((_) => writeCaskWithCs(outputDirectory, "DartContentShellEdge", "dart-content-shell-edge.rb", client, raw_root_url, "dartium/content_shell-macos-ia32-release.zip",  '''
@@ -141,6 +146,7 @@ void main(List<String> arguments) {
         ''' + cs_install_section, "-"))
     .catchError((e) {
         print("DartContentShellEdge: ${e} ${e.stackTrace}");     // Finally, callback fires.
+        exitCode = 2;
         return -1;
       })
     .then((_) => writeCask(outputDirectory, "DartContentShellStable", "dart-content-shell-stable.rb", client, stable_root_url, "dartium/content_shell-macos-ia32-release.zip",  '''
@@ -149,6 +155,7 @@ void main(List<String> arguments) {
         ''' + cs_install_section, "-"))
     .catchError((e) {
         print("DartContentShellStable: ${e} ${e.stackTrace}");     // Finally, callback fires.
+        exitCode = 2;
         return -1;
       })
     .then((_) {
