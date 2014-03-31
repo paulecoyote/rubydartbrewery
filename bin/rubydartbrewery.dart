@@ -95,7 +95,7 @@ void main(List<String> arguments) {
 # conflicts_with 'dart-editor-edge', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor-edge-cs', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor-stable', :because => 'installation of dart-dsk tools in path'
-''' + dart_install_section)
+''' + dart_install_section, "[Changes](http://storage.googleapis.com/dart-archive/channels/dev/release/latest/changelog.html)")
     .catchError((e) {
         print("DartEditorDev: ${e} ${e.stackTrace}");     // Finally, callback fires.
         return -1;
@@ -104,7 +104,7 @@ void main(List<String> arguments) {
 # conflicts_with 'dart-editor-dev', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor-edge-cs', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor-stable', :because => 'installation of dart-dsk tools in path'
-        ''' + dart_install_section))
+        ''' + dart_install_section, "-"))
     .catchError((e) {
         print("DartEditorEdge: ${e} ${e.stackTrace}");     // Finally, callback fires.
         return -1;
@@ -113,7 +113,7 @@ void main(List<String> arguments) {
 # conflicts_with 'dart-editor-dev', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor-edge', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor-stable', :because => 'installation of dart-dsk tools in path'
-        ''' + dart_install_section))
+        ''' + dart_install_section, "-"))
     .catchError((e) {
         print("DartEditorEdgeCs: ${e} ${e.stackTrace}");     // Finally, callback fires.
         return -1;
@@ -122,7 +122,7 @@ void main(List<String> arguments) {
 # conflicts_with 'dart-editor-dev', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor-edge', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor-edge-cs', :because => 'installation of dart-dsk tools in path'
-        ''' + dart_install_section))
+        ''' + dart_install_section, "[Changes](http://storage.googleapis.com/dart-archive/channels/stable/release/latest/changelog.html)"))
     .catchError((e) {
         print("DartEditorStable: ${e} ${e.stackTrace}");     // Finally, callback fires.
         return -1;
@@ -130,7 +130,7 @@ void main(List<String> arguments) {
     .then((_) => writeCask(outputDirectory, "DartContentShellDev", "dart-content-shell-dev.rb", client, dev_root_url, "dartium/content_shell-macos-ia32-release.zip",  '''
 # conflicts_with 'dart-content-shell-edge', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-content-shell-stable', :because => 'installation of dart-dsk tools in path'
-        ''' + cs_install_section))
+        ''' + cs_install_section, "-"))
     .catchError((e) {
         print("DartContentShellDev: ${e} ${e.stackTrace}");     // Finally, callback fires.
         return -1;
@@ -138,7 +138,7 @@ void main(List<String> arguments) {
     .then((_) => writeCaskWithCs(outputDirectory, "DartContentShellEdge", "dart-content-shell-edge.rb", client, raw_root_url, "dartium/content_shell-macos-ia32-release.zip",  '''
 # conflicts_with 'dart-content-shell-dev', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-content-shell-stable', :because => 'installation of dart-dsk tools in path'
-        ''' + cs_install_section))
+        ''' + cs_install_section, "-"))
     .catchError((e) {
         print("DartContentShellEdge: ${e} ${e.stackTrace}");     // Finally, callback fires.
         return -1;
@@ -146,7 +146,7 @@ void main(List<String> arguments) {
     .then((_) => writeCask(outputDirectory, "DartContentShellStable", "dart-content-shell-stable.rb", client, stable_root_url, "dartium/content_shell-macos-ia32-release.zip",  '''
 # conflicts_with 'dart-content-shell-dev', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-content-shell-edge', :because => 'installation of dart-dsk tools in path'
-        ''' + cs_install_section))
+        ''' + cs_install_section, "-"))
     .catchError((e) {
         print("DartContentShellStable: ${e} ${e.stackTrace}");     // Finally, callback fires.
         return -1;
@@ -156,8 +156,8 @@ void main(List<String> arguments) {
       return outputFile.create(recursive: true);
     })
     .then((file){
-      return file.writeAsString('''| Edition | Version | Revision | Archive | MD5 |
-| ------- | ------- | -------- | ------- | --- |
+      return file.writeAsString('''| Edition | Version | Revision | Archive | MD5 | Notes |
+| ------- | ------- | -------- | ------- | --- | ----- |
 ''');
     })
     .then((file){
@@ -167,7 +167,7 @@ void main(List<String> arguments) {
   });
 }
 
-Future writeCask(Directory outputDirectory, String cask_class_name, String cask_file_name, HttpClient client, String rootUrl, String zipPath, String installSection)
+Future writeCask(Directory outputDirectory, String cask_class_name, String cask_file_name, HttpClient client, String rootUrl, String zipPath, String installSection, String notes)
 {
   String release_version_file_url = "${rootUrl}/latest/VERSION";
   String release_version, release_revision, base_url, url, md5_file_url, md5, cs_md5_file_url, cs_md5, cs_url;
@@ -197,7 +197,7 @@ Future writeCask(Directory outputDirectory, String cask_class_name, String cask_
         isRawCsAvailable = cs_md5 != "xml";
 
         // Torn between using release_revision and release_version for cask version :/
-        versions_file.write("| ${cask_class_name} | ${release_version} | ${release_revision} | [Zip](${url}) | [md5]($md5_file_url) |\n");
+        versions_file.write("| ${cask_class_name} | ${release_version} | ${release_revision} | [Zip](${url}) | [md5]($md5_file_url) | ${notes} |\n");
         String cask = createDarteditorCask(cask_class_name, url, release_revision, md5, isRawCsAvailable, installSection);
         File outputFile = new File(outputDirectory.path + '/' + cask_file_name);
         return outputFile.create(recursive: true)
@@ -208,7 +208,7 @@ Future writeCask(Directory outputDirectory, String cask_class_name, String cask_
       });
 }
 
-Future writeCaskWithCs(Directory outputDirectory, String cask_class_name, String cask_file_name, HttpClient client, String rootUrl, String zipPath, String installSection)
+Future writeCaskWithCs(Directory outputDirectory, String cask_class_name, String cask_file_name, HttpClient client, String rootUrl, String zipPath, String installSection, String notes)
 {
   String release_version_file_url = "${rootUrl}/latest/VERSION";
   String release_version, release_revision, base_url, url, md5_file_url, md5, cs_md5_file_url, cs_md5, cs_url;
@@ -240,7 +240,7 @@ Future writeCaskWithCs(Directory outputDirectory, String cask_class_name, String
         if (isRawCsAvailable)
         {
           // Torn between using release_revision and release_version for cask version :/
-          versions_file.write("| ${cask_class_name} | ${release_version} | ${release_revision} | [Zip](${url}) | [md5]($md5_file_url) |\n");
+          versions_file.write("| ${cask_class_name} | ${release_version} | ${release_revision} | [Zip](${url}) | [md5]($md5_file_url) | ${notes} |\n");
           String cask = createDarteditorCask(cask_class_name, url, release_revision, md5, isRawCsAvailable, installSection);
           File outputFile = new File(outputDirectory.path + '/' + cask_file_name);
           return outputFile.create(recursive: true)
@@ -252,12 +252,12 @@ Future writeCaskWithCs(Directory outputDirectory, String cask_class_name, String
         else
         {
           revision--;
-          return writeCaskWithCsRevision(revision, outputDirectory, cask_class_name, cask_file_name, client, rootUrl, zipPath, installSection);
+          return writeCaskWithCsRevision(revision, outputDirectory, cask_class_name, cask_file_name, client, rootUrl, zipPath, installSection, notes);
         }
       });
 }
 
-Future writeCaskWithCsRevision(int revision, Directory outputDirectory, String cask_class_name, String cask_file_name, HttpClient client, String rootUrl, String zipPath, String installSection)
+Future writeCaskWithCsRevision(int revision, Directory outputDirectory, String cask_class_name, String cask_file_name, HttpClient client, String rootUrl, String zipPath, String installSection, String notes)
 {
   String release_version_file_url = "${rootUrl}/$revision/VERSION";
     String release_version, release_revision, base_url, url, md5_file_url, md5, cs_md5_file_url, cs_md5, cs_url;
@@ -270,7 +270,7 @@ Future writeCaskWithCsRevision(int revision, Directory outputDirectory, String c
             // No version with this revision
             // Really gross way of doing recursion with futures.
             revision--;
-            return writeCaskWithCsRevision(revision, outputDirectory, cask_class_name, cask_file_name, client, rootUrl, zipPath, installSection);
+            return writeCaskWithCsRevision(revision, outputDirectory, cask_class_name, cask_file_name, client, rootUrl, zipPath, installSection, notes);
           }
 
           release_version = version_regex.firstMatch(body).group(1);
@@ -297,7 +297,7 @@ Future writeCaskWithCsRevision(int revision, Directory outputDirectory, String c
           if (isRawCsAvailable)
           {
             // Torn between using release_revision and release_version for cask version :/
-            versions_file.write("| ${cask_class_name} | ${release_version} | ${release_revision} | [Zip](${url}) | [md5]($md5_file_url) |\n");
+            versions_file.write("| ${cask_class_name} | ${release_version} | ${release_revision} | [Zip](${url}) | [md5]($md5_file_url) | ${notes} |\n");
             String cask = createDarteditorCask(cask_class_name, url, release_revision, md5, isRawCsAvailable, installSection);
             File outputFile = new File(outputDirectory.path + '/' + cask_file_name);
             return outputFile.create(recursive: true)
@@ -309,7 +309,7 @@ Future writeCaskWithCsRevision(int revision, Directory outputDirectory, String c
           else
           {
             revision--;
-            return writeCaskWithCsRevision(revision, outputDirectory, cask_class_name, cask_file_name, client, rootUrl, zipPath, installSection);
+            return writeCaskWithCsRevision(revision, outputDirectory, cask_class_name, cask_file_name, client, rootUrl, zipPath, installSection, notes);
           }
         });
 }
