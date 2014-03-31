@@ -135,7 +135,7 @@ void main(List<String> arguments) {
         print("DartContentShellDev: ${e} ${e.stackTrace}");     // Finally, callback fires.
         return -1;
       })
-    .then((_) => writeCask(outputDirectory, "DartContentShellEdge", "dart-content-shell-edge.rb", client, raw_root_url, "dartium/content_shell-macos-ia32-release.zip",  '''
+    .then((_) => writeCaskWithCs(outputDirectory, "DartContentShellEdge", "dart-content-shell-edge.rb", client, raw_root_url, "dartium/content_shell-macos-ia32-release.zip",  '''
 # conflicts_with 'dart-content-shell-dev', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-content-shell-stable', :because => 'installation of dart-dsk tools in path'
         ''' + cs_install_section))
