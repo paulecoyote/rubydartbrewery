@@ -97,7 +97,7 @@ void main(List<String> arguments) {
 # conflicts_with 'dart-editor-stable', :because => 'installation of dart-dsk tools in path'
 ''' + dart_install_section)
     .catchError((e) {
-        print("DartEditorDev: ${e}");     // Finally, callback fires.
+        print("DartEditorDev: ${e} ${e.stackTrace}");     // Finally, callback fires.
         return -1;
       })
     .then((_) => writeCask(outputDirectory, "DartEditorEdge", "dart-editor-edge.rb", client, raw_root_url, "editor/darteditor-macos-x64.zip",  '''
@@ -106,7 +106,7 @@ void main(List<String> arguments) {
 # conflicts_with 'dart-editor-stable', :because => 'installation of dart-dsk tools in path'
         ''' + dart_install_section))
     .catchError((e) {
-        print("DartEditorEdge: ${e}");     // Finally, callback fires.
+        print("DartEditorEdge: ${e} ${e.stackTrace}");     // Finally, callback fires.
         return -1;
       })
     .then((_) => writeCaskWithCs(outputDirectory, "DartEditorEdgeCs", "dart-editor-edge-cs.rb", client, raw_root_url, "editor/darteditor-macos-x64.zip",  '''
@@ -115,7 +115,7 @@ void main(List<String> arguments) {
 # conflicts_with 'dart-editor-stable', :because => 'installation of dart-dsk tools in path'
         ''' + dart_install_section))
     .catchError((e) {
-        print("DartEditorEdgeCs: ${e}");     // Finally, callback fires.
+        print("DartEditorEdgeCs: ${e} ${e.stackTrace}");     // Finally, callback fires.
         return -1;
       })
     .then((_) => writeCask(outputDirectory, "DartEditorStable", "dart-editor-stable.rb", client, stable_root_url, "editor/darteditor-macos-x64.zip",  '''
@@ -124,7 +124,7 @@ void main(List<String> arguments) {
 # conflicts_with 'dart-editor-edge-cs', :because => 'installation of dart-dsk tools in path'
         ''' + dart_install_section))
     .catchError((e) {
-        print("DartEditorStable: ${e}");     // Finally, callback fires.
+        print("DartEditorStable: ${e} ${e.stackTrace}");     // Finally, callback fires.
         return -1;
       })
     .then((_) => writeCask(outputDirectory, "DartContentShellDev", "dart-content-shell-dev.rb", client, dev_root_url, "dartium/content_shell-macos-ia32-release.zip",  '''
@@ -132,7 +132,7 @@ void main(List<String> arguments) {
 # conflicts_with 'dart-content-shell-stable', :because => 'installation of dart-dsk tools in path'
         ''' + cs_install_section))
     .catchError((e) {
-        print("DartContentShellDev: ${e}");     // Finally, callback fires.
+        print("DartContentShellDev: ${e} ${e.stackTrace}");     // Finally, callback fires.
         return -1;
       })
     .then((_) => writeCask(outputDirectory, "DartContentShellEdge", "dart-content-shell-edge.rb", client, raw_root_url, "dartium/content_shell-macos-ia32-release.zip",  '''
@@ -140,7 +140,7 @@ void main(List<String> arguments) {
 # conflicts_with 'dart-content-shell-stable', :because => 'installation of dart-dsk tools in path'
         ''' + cs_install_section))
     .catchError((e) {
-        print("DartContentShellEdge: ${e}");     // Finally, callback fires.
+        print("DartContentShellEdge: ${e} ${e.stackTrace}");     // Finally, callback fires.
         return -1;
       })
     .then((_) => writeCask(outputDirectory, "DartContentShellStable", "dart-content-shell-stable.rb", client, stable_root_url, "dartium/content_shell-macos-ia32-release.zip",  '''
@@ -148,7 +148,7 @@ void main(List<String> arguments) {
 # conflicts_with 'dart-content-shell-edge', :because => 'installation of dart-dsk tools in path'
         ''' + cs_install_section))
     .catchError((e) {
-        print("DartContentShellStable: ${e}");     // Finally, callback fires.
+        print("DartContentShellStable: ${e} ${e.stackTrace}");     // Finally, callback fires.
         return -1;
       })
     .then((_) {
