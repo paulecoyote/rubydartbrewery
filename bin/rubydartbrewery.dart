@@ -156,6 +156,11 @@ void main(List<String> arguments) {
       return outputFile.create(recursive: true);
     })
     .then((file){
+      return file.writeAsString('''| Edition | Version | Revision | Archive | MD5 |
+| ------- | ------- | -------- | ------- | --- |
+''');
+    })
+    .then((file){
       String verBody = versions_file.toString();
       if (verBody != null && verBody != "")
         file.writeAsString(verBody);
@@ -192,7 +197,7 @@ Future writeCask(Directory outputDirectory, String cask_class_name, String cask_
         isRawCsAvailable = cs_md5 != "xml";
 
         // Torn between using release_revision and release_version for cask version :/
-        versions_file.write("${cask_class_name} now version ${release_version} (revision ${release_revision}). Zip: ${url}\n");
+        versions_file.write("| ${cask_class_name} | ${release_version} | ${release_revision} | [Zip](${url}) | [md5]($md5_file_url) |\n");
         String cask = createDarteditorCask(cask_class_name, url, release_revision, md5, isRawCsAvailable, installSection);
         File outputFile = new File(outputDirectory.path + '/' + cask_file_name);
         return outputFile.create(recursive: true)
@@ -235,7 +240,7 @@ Future writeCaskWithCs(Directory outputDirectory, String cask_class_name, String
         if (isRawCsAvailable)
         {
           // Torn between using release_revision and release_version for cask version :/
-          versions_file.write("${cask_class_name} now version ${release_version} (revision ${release_revision}). Zip: ${url}\n");
+          versions_file.write("| ${cask_class_name} | ${release_version} | ${release_revision} | [Zip](${url}) | [md5]($md5_file_url) |\n");
           String cask = createDarteditorCask(cask_class_name, url, release_revision, md5, isRawCsAvailable, installSection);
           File outputFile = new File(outputDirectory.path + '/' + cask_file_name);
           return outputFile.create(recursive: true)
@@ -292,7 +297,7 @@ Future writeCaskWithCsRevision(int revision, Directory outputDirectory, String c
           if (isRawCsAvailable)
           {
             // Torn between using release_revision and release_version for cask version :/
-            versions_file.write("${cask_class_name} now version ${release_version} (revision ${release_revision}). Zip: ${url}\n");
+            versions_file.write("| ${cask_class_name} | ${release_version} | ${release_revision} | [Zip](${url}) | [md5]($md5_file_url) |\n");
             String cask = createDarteditorCask(cask_class_name, url, release_revision, md5, isRawCsAvailable, installSection);
             File outputFile = new File(outputDirectory.path + '/' + cask_file_name);
             return outputFile.create(recursive: true)
