@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:args/args.dart';
 
-const String root_url = "http://storage.googleapis.com/dart-archive/channels";
-const String homepage_url = "http://www.dartlang.org/tools/editor/";
+const String root_url = "https://storage.googleapis.com/dart-archive/channels";
+const String homepage_url = "https://www.dartlang.org/tools/editor/";
 
 const String dart_install_section = '''
   conflicts_with 'dart', :because => 'installation of dart-dsk tools in path'
@@ -95,7 +95,7 @@ void main(List<String> arguments) {
 # conflicts_with 'dart-editor-edge', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor-edge-cs', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor-stable', :because => 'installation of dart-dsk tools in path'
-''' + dart_install_section, "[Changes](http://storage.googleapis.com/dart-archive/channels/dev/release/latest/changelog.html)")
+''' + dart_install_section, "[Changes](https://storage.googleapis.com/dart-archive/channels/dev/release/latest/changelog.html)")
     .catchError((e) {
         print("DartEditorDev: ${e} ${e.stackTrace}");     // Finally, callback fires.
         exitCode = 2;
@@ -125,7 +125,7 @@ void main(List<String> arguments) {
 # conflicts_with 'dart-editor-dev', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor-edge', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor-edge-cs', :because => 'installation of dart-dsk tools in path'
-        ''' + dart_install_section, "[Changes](http://storage.googleapis.com/dart-archive/channels/stable/release/latest/changelog.html)"))
+        ''' + dart_install_section, "[Changes](https://storage.googleapis.com/dart-archive/channels/stable/release/latest/changelog.html)"))
     .catchError((e) {
         print("DartEditorStable: ${e} ${e.stackTrace}");     // Finally, callback fires.
         exitCode = 2;
@@ -327,7 +327,7 @@ String createDarteditorCask(String class_name, String url, String version, Strin
 
 class ${class_name} < Formula
   url "${url}"
-  homepage "http://www.dartlang.org/tools/editor/"
+  homepage "https://www.dartlang.org/tools/editor/"
   version "${version}"
   md5 "${md5}"
   
