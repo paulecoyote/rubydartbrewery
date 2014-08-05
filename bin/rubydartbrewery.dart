@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:args/args.dart';
 
-const String root_url = "https://storage.googleapis.com/dart-archive/channels";
-const String homepage_url = "https://www.dartlang.org/tools/editor/";
+const String ROOT_URL = "https://storage.googleapis.com/dart-archive/channels";
+const String HOMEPAGE_URL = "https://www.dartlang.org/tools/editor/";
 
 const String dart_install_section = '''
   conflicts_with 'dart', :because => 'installation of dart-dsk tools in path'
@@ -68,13 +68,9 @@ const String cs_install_section = '''
       bin.install_symlink Hash[item, 'content_shell']
   end''';
 
-final String dev_root_url = "${root_url}/dev/release";
-final String raw_root_url = "${root_url}/be/raw";
-final String stable_root_url = "${root_url}/stable/release";
-
-final String github_dev_root_url = "https://raw.github.com/PaulECoyote/homebrew-versions/master/Casks/darteditor-dev.rb";
-final String github_raw_root_url = "https://raw.github.com/PaulECoyote/homebrew-versions/master/Casks/darteditor-edge.rb";
-final String github_stable_root_url = "https://raw.github.com/PaulECoyote/homebrew-versions/master/Casks/darteditor-stable.rb";
+final String dev_root_url = "${ROOT_URL}/dev/release";
+final String raw_root_url = "${ROOT_URL}/be/raw";
+final String stable_root_url = "${ROOT_URL}/stable/release";
 
 final RegExp version_regex = new RegExp(r'\"version\"\s*:\s*\"([\w\.-]+)\"');
 final RegExp revision_regex = new RegExp(r'\"revision\"\s*:\s*\"([\w\.-]+)\"');
@@ -174,8 +170,9 @@ void main(List<String> arguments) {
   });
 }
 
-Future writeCask(Directory outputDirectory, String cask_class_name, String cask_file_name, HttpClient client, String rootUrl, String zipPath, String installSection, String notes)
-{
+Future writeCask(Directory outputDirectory, String caskClassName,
+                 String caskFileName, HttpClient client, String rootUrl,
+                 String zipPath, String installSection, String notes) {
   String release_version_file_url = "${rootUrl}/latest/VERSION";
   String release_version, release_revision, base_url, url, md5_file_url, md5, cs_md5_file_url, cs_md5, cs_url;
   bool isRawCsAvailable = false;
@@ -204,9 +201,9 @@ Future writeCask(Directory outputDirectory, String cask_class_name, String cask_
         isRawCsAvailable = cs_md5 != "xml";
 
         // Torn between using release_revision and release_version for cask version :/
-        versions_file.write("| ${cask_class_name} | ${release_version} | ${release_revision} | [Zip](${url}) | [md5]($md5_file_url) | ${notes} |\n");
-        String cask = createDarteditorCask(cask_class_name, url, release_revision, md5, isRawCsAvailable, installSection);
-        File outputFile = new File(outputDirectory.path + '/' + cask_file_name);
+        versions_file.write("| ${caskClassName} | ${release_version} | ${release_revision} | [Zip](${url}) | [md5]($md5_file_url) | ${notes} |\n");
+        String cask = createDarteditorCask(caskClassName, url, release_revision, md5, isRawCsAvailable, installSection);
+        File outputFile = new File(outputDirectory.path + '/' + caskFileName);
         return outputFile.create(recursive: true)
             .then((file) {
                             outputFile.writeAsString(cask);
@@ -215,8 +212,9 @@ Future writeCask(Directory outputDirectory, String cask_class_name, String cask_
       });
 }
 
-Future writeCaskWithCs(Directory outputDirectory, String cask_class_name, String cask_file_name, HttpClient client, String rootUrl, String zipPath, String installSection, String notes)
-{
+Future writeCaskWithCs(Directory outputDirectory, String caskClassName,
+                       String caskFileName, HttpClient client, String rootUrl,
+                       String zipPath, String installSection, String notes) {
   String release_version_file_url = "${rootUrl}/latest/VERSION";
   String release_version, release_revision, base_url, url, md5_file_url, md5, cs_md5_file_url, cs_md5, cs_url;
   bool isRawCsAvailable = false;
@@ -247,9 +245,9 @@ Future writeCaskWithCs(Directory outputDirectory, String cask_class_name, String
         if (isRawCsAvailable)
         {
           // Torn between using release_revision and release_version for cask version :/
-          versions_file.write("| ${cask_class_name} | ${release_version} | ${release_revision} | [Zip](${url}) | [md5]($md5_file_url) | ${notes} |\n");
-          String cask = createDarteditorCask(cask_class_name, url, release_revision, md5, isRawCsAvailable, installSection);
-          File outputFile = new File(outputDirectory.path + '/' + cask_file_name);
+          versions_file.write("| ${caskClassName} | ${release_version} | ${release_revision} | [Zip](${url}) | [md5]($md5_file_url) | ${notes} |\n");
+          String cask = createDarteditorCask(caskClassName, url, release_revision, md5, isRawCsAvailable, installSection);
+          File outputFile = new File(outputDirectory.path + '/' + caskFileName);
           return outputFile.create(recursive: true)
             .then((file) {
             outputFile.writeAsString(cask);
@@ -259,7 +257,7 @@ Future writeCaskWithCs(Directory outputDirectory, String cask_class_name, String
         else
         {
           revision--;
-          return writeCaskWithCsRevision(revision, outputDirectory, cask_class_name, cask_file_name, client, rootUrl, zipPath, installSection, notes);
+          return writeCaskWithCsRevision(revision, outputDirectory, caskClassName, caskFileName, client, rootUrl, zipPath, installSection, notes);
         }
       });
 }
@@ -321,8 +319,9 @@ Future writeCaskWithCsRevision(int revision, Directory outputDirectory, String c
         });
 }
 
-String createDarteditorCask(String class_name, String url, String version, String md5, bool is_cs_available, String installSection)
-{
+String createDarteditorCask(String class_name, String url, String version,
+                            String md5, bool is_cs_available,
+                            String installSection) {
   return '''require "formula"
 
 class ${class_name} < Formula
