@@ -1,5 +1,6 @@
-name: rubydartbrewery
+name: ruby_dart_brewery
 description: A sample command-line application
 homepage: https://github.com/PaulECoyote/rubydartbrewery
 dependencies:
   args: any
+  http: any
