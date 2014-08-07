@@ -7,8 +7,6 @@ final String devRootUrl = "${ROOT_URL}/dev/release";
 final String rawRootUrl = "${ROOT_URL}/be/raw";
 final String stableRootUrl = "${ROOT_URL}/stable/release";
 
-final RegExp versionRegex = new RegExp(r'\"version\"\s*:\s*\"([\w\.-]+)\"');
-final RegExp revisionRegex = new RegExp(r'\"revision\"\s*:\s*\"([\w\.-]+)\"');
 final RegExp md5Regex = new RegExp(r'([\w]+)');
 
 const String DART_INSTALL_SECTION = '''
