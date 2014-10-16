@@ -7,7 +7,7 @@ const String ROOT_URL = "https://storage.googleapis.com/dart-archive/channels";
 const String HOMEPAGE_URL = "https://www.dartlang.org/tools/editor/";
 
 const String dart_install_section = '''
-  conflicts_with 'dart', :because => 'installation of dart-dsk tools in path'
+# conflicts_with 'dart', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor', :because => 'installation of dart-dsk tools in path'
   depends_on :arch => :x86_64
 
