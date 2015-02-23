@@ -29,8 +29,8 @@ git reset --hard origin/master
 
 # Change back to script directory and update ruby files
 cd "$DIR"
-pub update
-if dart bin/rubydartbrewery.dart --output-path "$outputPath/"; then
+/usr/local/bin/pub update
+if /usr/local/bin/dart bin/rubydartbrewery.dart --output-path "$outputPath/"; then
     # Commit any changes made to the generated ruby files
     cd "$outputPath"
     cat README-template.md dart_versions.txt > README.md
