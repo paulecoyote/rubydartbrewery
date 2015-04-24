@@ -219,7 +219,6 @@ Future writeCask(Directory outputDirectory, String caskClassName,
                .then((HttpClientResponse resp) => resp.listen( (List<int> data) {
                   checksummer.add(data);
                   md5Checksummer.add(data);
-                  ////print("Processed ${data.length} bytes of $url");
                 }).asFuture())
                .then( (_) {
                   String calcMd5 = CryptoUtils.bytesToHex(md5Checksummer.close());
@@ -362,15 +361,16 @@ String createDarteditorCask(String class_name, String url, String version,
                             String installSection) {
 
   String checksum ="";
-  if (sha256 != null && sha256.isNotEmpty) checksum += "  sha256 \"$sha256\"\n";
-  if (md5 != null && md5.isNotEmpty) checksum += "  md5 \"$md5\"\n";
+  if (sha256 != null && sha256.isNotEmpty) {
+    checksum += "sha256 \"$sha256\"";
+  } else if (md5 != null && md5.isNotEmpty) checksum += "md5 \"$md5\"";
   return '''require "formula"
 
 class ${class_name} < Formula
   url "${url}"
   homepage "https://www.dartlang.org/tools/editor/"
   version "${version}"
-${checksum}
+  ${checksum}
   
   ${installSection}
 end
