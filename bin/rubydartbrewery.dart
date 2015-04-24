@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'dart:io';
 import 'package:args/args.dart';
+
+import 'package:crypto/crypto.dart';
 
 const String ROOT_URL = "https://storage.googleapis.com/dart-archive/channels";
 const String HOMEPAGE_URL = "https://www.dartlang.org/tools/editor/";
@@ -91,7 +94,7 @@ void main(List<String> arguments) {
 # conflicts_with 'dart-editor-edge', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor-edge-cs', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor-stable', :because => 'installation of dart-dsk tools in path'
-''' + dart_install_section, "[Changes](https://storage.googleapis.com/dart-archive/channels/dev/release/latest/changelog.html)")
+''' + dart_install_section, "[Changes](https://storage.googleapis.com/dart-archive/channels/dev/release/latest/changelog.html)", false)
     .catchError((e) {
         print("DartEditorDev: ${e} ${e.stackTrace}");     // Finally, callback fires.
         exitCode = 2;
@@ -101,7 +104,7 @@ void main(List<String> arguments) {
 # conflicts_with 'dart-editor-dev', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor-edge-cs', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor-stable', :because => 'installation of dart-dsk tools in path'
-        ''' + dart_install_section, "-"))
+        ''' + dart_install_section, "-", false))
     .catchError((e) {
         print("DartEditorEdge: ${e} ${e.stackTrace}");     // Finally, callback fires.
         exitCode = 2;
@@ -121,7 +124,7 @@ void main(List<String> arguments) {
 # conflicts_with 'dart-editor-dev', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor-edge', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-editor-edge-cs', :because => 'installation of dart-dsk tools in path'
-        ''' + dart_install_section, "[Changes](https://storage.googleapis.com/dart-archive/channels/stable/release/latest/changelog.html)"))
+        ''' + dart_install_section, "[Changes](https://storage.googleapis.com/dart-archive/channels/stable/release/latest/changelog.html)", true))
     .catchError((e) {
         print("DartEditorStable: ${e} ${e.stackTrace}");     // Finally, callback fires.
         exitCode = 2;
@@ -130,7 +133,7 @@ void main(List<String> arguments) {
     .then((_) => writeCask(outputDirectory, "DartContentShellDev", "dart-content-shell-dev.rb", client, dev_root_url, "dartium/content_shell-macos-ia32-release.zip",  '''
 # conflicts_with 'dart-content-shell-edge', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-content-shell-stable', :because => 'installation of dart-dsk tools in path'
-        ''' + cs_install_section, "-"))
+        ''' + cs_install_section, "-", false))
     .catchError((e) {
         print("DartContentShellDev: ${e} ${e.stackTrace}");     // Finally, callback fires.
         exitCode = 2;
@@ -148,7 +151,7 @@ void main(List<String> arguments) {
     .then((_) => writeCask(outputDirectory, "DartContentShellStable", "dart-content-shell-stable.rb", client, stable_root_url, "dartium/content_shell-macos-ia32-release.zip",  '''
 # conflicts_with 'dart-content-shell-dev', :because => 'installation of dart-dsk tools in path'
 # conflicts_with 'dart-content-shell-edge', :because => 'installation of dart-dsk tools in path'
-        ''' + cs_install_section, "-"))
+        ''' + cs_install_section, "-", false))
     .catchError((e) {
         print("DartContentShellStable: ${e} ${e.stackTrace}");     // Finally, callback fires.
         exitCode = 2;
@@ -172,9 +175,10 @@ void main(List<String> arguments) {
 
 Future writeCask(Directory outputDirectory, String caskClassName,
                  String caskFileName, HttpClient client, String rootUrl,
-                 String zipPath, String installSection, String notes) {
+                 String zipPath, String installSection, String notes, bool downloadToFigureOutSha256) {
   String release_version_file_url = "${rootUrl}/latest/VERSION";
-  String release_version, release_revision, base_url, url, md5_file_url, md5, cs_md5_file_url, cs_md5, cs_url;
+  String release_version, release_revision, base_url, url, md5_file_url, md5, cs_md5_file_url, cs_md5, cs_url,
+    sha256, sha256_file_url;
   bool isRawCsAvailable = false;
 
   return getAsString(Uri.parse(release_version_file_url), client)
@@ -184,6 +188,7 @@ Future writeCask(Directory outputDirectory, String caskClassName,
         base_url = "${rootUrl}/${release_revision}";
         url = "${base_url}/${zipPath}";
         md5_file_url = "${url}.md5sum";
+        sha256_file_url = "${url}.sha256sum";
         cs_md5_file_url = "${base_url}/dartium/content_shell-macos-ia32-release.zip.md5sum";
 
         return getAsString(Uri.parse(md5_file_url), client);
@@ -200,9 +205,41 @@ Future writeCask(Directory outputDirectory, String caskClassName,
 
         isRawCsAvailable = cs_md5 != "xml";
 
+        return getAsString(Uri.parse(sha256_file_url), client);
+      })
+      .then((String body) {
+        if (body != null && !body.startsWith("<?xml version='1.0' encoding='UTF-8'?><Error>", 0)) {
+          sha256 = md5_regex.firstMatch(body).group(1);
+        } else if (downloadToFigureOutSha256) {
+          SHA256 checksummer = new SHA256();
+          MD5 md5Checksummer = new MD5();
+
+          return client.getUrl(Uri.parse(url))
+               .then((HttpClientRequest request) => request.close())
+               .then((HttpClientResponse resp) => resp.listen( (List<int> data) {
+                  checksummer.add(data);
+                  md5Checksummer.add(data);
+                  ////print("Processed ${data.length} bytes of $url");
+                }).asFuture())
+               .then( (_) {
+                  String calcMd5 = CryptoUtils.bytesToHex(md5Checksummer.close());
+                  if (md5 != calcMd5) {
+                    print("Downloaded md5 does not match calculated. Expected:\n${md5}\nActual:\n${calcMd5}");
+                  } else {
+                    print("Md5 matches calculated md5");
+                  }
+
+                  sha256 = CryptoUtils.bytesToHex(checksummer.close());
+                  return sha256;
+                });
+        }
+
+        return sha256;
+      }).then((String body) {
+
         // Torn between using release_revision and release_version for cask version :/
         versions_file.write("| ${caskClassName} | ${release_version} | ${release_revision} | [Zip](${url}) | [md5]($md5_file_url) | ${notes} |\n");
-        String cask = createDarteditorCask(caskClassName, url, release_revision, md5, isRawCsAvailable, installSection);
+        String cask = createDarteditorCask(caskClassName, url, release_revision, md5, sha256, isRawCsAvailable, installSection);
         File outputFile = new File(outputDirectory.path + '/' + caskFileName);
         return outputFile.create(recursive: true)
             .then((file) {
@@ -216,7 +253,8 @@ Future writeCaskWithCs(Directory outputDirectory, String caskClassName,
                        String caskFileName, HttpClient client, String rootUrl,
                        String zipPath, String installSection, String notes) {
   String release_version_file_url = "${rootUrl}/latest/VERSION";
-  String release_version, release_revision, base_url, url, md5_file_url, md5, cs_md5_file_url, cs_md5, cs_url;
+  String release_version, release_revision, base_url, url, md5_file_url, md5, cs_md5_file_url, cs_md5, cs_url,
+    sha256, sha256_file_url;
   bool isRawCsAvailable = false;
 
   return getAsString(Uri.parse(release_version_file_url), client)
@@ -246,7 +284,7 @@ Future writeCaskWithCs(Directory outputDirectory, String caskClassName,
         {
           // Torn between using release_revision and release_version for cask version :/
           versions_file.write("| ${caskClassName} | ${release_version} | ${release_revision} | [Zip](${url}) | [md5]($md5_file_url) | ${notes} |\n");
-          String cask = createDarteditorCask(caskClassName, url, release_revision, md5, isRawCsAvailable, installSection);
+          String cask = createDarteditorCask(caskClassName, url, release_revision, md5, sha256, isRawCsAvailable, installSection);
           File outputFile = new File(outputDirectory.path + '/' + caskFileName);
           return outputFile.create(recursive: true)
             .then((file) {
@@ -303,7 +341,7 @@ Future writeCaskWithCsRevision(int revision, Directory outputDirectory, String c
           {
             // Torn between using release_revision and release_version for cask version :/
             versions_file.write("| ${cask_class_name} | ${release_version} | ${release_revision} | [Zip](${url}) | [md5]($md5_file_url) | ${notes} |\n");
-            String cask = createDarteditorCask(cask_class_name, url, release_revision, md5, isRawCsAvailable, installSection);
+            String cask = createDarteditorCask(cask_class_name, url, release_revision, md5, "", isRawCsAvailable, installSection);
             File outputFile = new File(outputDirectory.path + '/' + cask_file_name);
             return outputFile.create(recursive: true)
               .then((file) {
@@ -320,15 +358,19 @@ Future writeCaskWithCsRevision(int revision, Directory outputDirectory, String c
 }
 
 String createDarteditorCask(String class_name, String url, String version,
-                            String md5, bool is_cs_available,
+                            String md5, String sha256, bool is_cs_available,
                             String installSection) {
+
+  String checksum ="";
+  if (sha256 != null && sha256.isNotEmpty) checksum += "  sha256 \"$sha256\"\n";
+  if (md5 != null && md5.isNotEmpty) checksum += "  md5 \"$md5\"\n";
   return '''require "formula"
 
 class ${class_name} < Formula
   url "${url}"
   homepage "https://www.dartlang.org/tools/editor/"
   version "${version}"
-  md5 "${md5}"
+${checksum}
   
   ${installSection}
 end
